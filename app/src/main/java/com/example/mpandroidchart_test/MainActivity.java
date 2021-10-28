@@ -4,6 +4,7 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
@@ -42,6 +43,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -52,7 +54,9 @@ public class MainActivity extends AppCompatActivity {
     private List<Chart> chartList;
     private TextView mText;
     private Integer neg, neu, pos, posCount, neuCount, negCount;
-    private String elementToFound_pos = "Positive", elementToFound_neu = "Neutral", elementToFound_neg = "Negative";
+    private final String elementToFound_pos = "Positive";
+    private final String elementToFound_neu = "Neutral";
+    private final String elementToFound_neg = "Negative";
 
 
     @Override
@@ -66,84 +70,84 @@ public class MainActivity extends AppCompatActivity {
         showPieChart();
     }
 
-    public void GroupBarChart(){
-        int DATA_COUNT = 3;
-        mChart = findViewById(R.id.bar_chart);
-        mChart.setDrawBarShadow(false);
-        mChart.getDescription().setEnabled(false);
-        mChart.setPinchZoom(false);
-        mChart.setDrawGridBackground(true);
-        // empty labels so that the names are spread evenly
-        String[] labels = {"", "1", "2", "3", ""};
-        XAxis xAxis = mChart.getXAxis();
-        xAxis.setCenterAxisLabels(true);
-        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xAxis.setDrawGridLines(true);
-        xAxis.setGranularity(1f); // only intervals of 1 day
-        xAxis.setTextColor(Color.BLACK);
-        xAxis.setTextSize(12);
-        xAxis.setAxisLineColor(Color.WHITE);
-        xAxis.setAxisMinimum(1f);
-        xAxis.setValueFormatter(new IndexAxisValueFormatter(labels));
-
-        YAxis leftAxis = mChart.getAxisLeft();
-        leftAxis.setTextColor(Color.BLACK);
-        leftAxis.setTextSize(12);
-        leftAxis.setAxisLineColor(Color.WHITE);
-        leftAxis.setDrawGridLines(true);
-        leftAxis.setGranularity(2);
-        leftAxis.setLabelCount(8, true);
-        leftAxis.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART);
-
-        mChart.getAxisRight().setEnabled(false);
-        mChart.getLegend().setEnabled(false);
-
-        float[] valOne = {10};
-        float[] valTwo = {60};
-        float[] valThree = {50};
-
-        ArrayList<BarEntry> barOne = new ArrayList<>();
-        ArrayList<BarEntry> barTwo = new ArrayList<>();
-        ArrayList<BarEntry> barThree = new ArrayList<>();
-        for (int i = 0; i < valOne.length; i++) {
-            barOne.add(new BarEntry(i, valOne[i]));
-            barTwo.add(new BarEntry(i, valTwo[i]));
-            barThree.add(new BarEntry(i, valThree[i]));
-        }
-
-        BarDataSet set1 = new BarDataSet(barOne, "barOne");
-        set1.setColor(Color.BLUE);
-        BarDataSet set2 = new BarDataSet(barTwo, "barTwo");
-        set2.setColor(Color.MAGENTA);
-        BarDataSet set3 = new BarDataSet(barThree, "barTwo");
-        set2.setColor(Color.GREEN);
-
-        set1.setHighlightEnabled(false);
-        set2.setHighlightEnabled(false);
-        set3.setHighlightEnabled(false);
-        set1.setDrawValues(false);
-        set2.setDrawValues(false);
-        set3.setDrawValues(false);
-
-        ArrayList<IBarDataSet> dataSets = new ArrayList<IBarDataSet>();
-        dataSets.add(set1);
-        dataSets.add(set2);
-        dataSets.add(set3);
-        BarData data = new BarData(dataSets);
-        float groupSpace = 0.4f;
-        float barSpace = 0f;
-        float barWidth = 0.3f;
-        // (barSpace + barWidth) * 2 + groupSpace = 1
-        data.setBarWidth(barWidth);
-        // so that the entire chart is shown when scrolled from right to left
-        xAxis.setAxisMaximum(labels.length - 1.1f);
-        mChart.setData(data);
-        mChart.setScaleEnabled(false);
-        mChart.setVisibleXRangeMaximum(6f);
-        mChart.groupBars(1f, groupSpace, barSpace);
-        mChart.invalidate();
-
-    }
+//    public void GroupBarChart(){
+//        int DATA_COUNT = 3;
+//        mChart = findViewById(R.id.bar_chart);
+//        mChart.setDrawBarShadow(false);
+//        mChart.getDescription().setEnabled(false);
+//        mChart.setPinchZoom(false);
+//        mChart.setDrawGridBackground(true);
+//        // empty labels so that the names are spread evenly
+//        String[] labels = {"", "1", "2", "3", ""};
+//        XAxis xAxis = mChart.getXAxis();
+//        xAxis.setCenterAxisLabels(true);
+//        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+//        xAxis.setDrawGridLines(true);
+//        xAxis.setGranularity(1f); // only intervals of 1 day
+//        xAxis.setTextColor(Color.BLACK);
+//        xAxis.setTextSize(12);
+//        xAxis.setAxisLineColor(Color.WHITE);
+//        xAxis.setAxisMinimum(1f);
+//        xAxis.setValueFormatter(new IndexAxisValueFormatter(labels));
+//
+//        YAxis leftAxis = mChart.getAxisLeft();
+//        leftAxis.setTextColor(Color.BLACK);
+//        leftAxis.setTextSize(12);
+//        leftAxis.setAxisLineColor(Color.WHITE);
+//        leftAxis.setDrawGridLines(true);
+//        leftAxis.setGranularity(2);
+//        leftAxis.setLabelCount(8, true);
+//        leftAxis.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART);
+//
+//        mChart.getAxisRight().setEnabled(false);
+//        mChart.getLegend().setEnabled(false);
+//
+//        float[] valOne = {10};
+//        float[] valTwo = {60};
+//        float[] valThree = {50};
+//
+//        ArrayList<BarEntry> barOne = new ArrayList<>();
+//        ArrayList<BarEntry> barTwo = new ArrayList<>();
+//        ArrayList<BarEntry> barThree = new ArrayList<>();
+//        for (int i = 0; i < valOne.length; i++) {
+//            barOne.add(new BarEntry(i, valOne[i]));
+//            barTwo.add(new BarEntry(i, valTwo[i]));
+//            barThree.add(new BarEntry(i, valThree[i]));
+//        }
+//
+//        BarDataSet set1 = new BarDataSet(barOne, "barOne");
+//        set1.setColor(Color.BLUE);
+//        BarDataSet set2 = new BarDataSet(barTwo, "barTwo");
+//        set2.setColor(Color.MAGENTA);
+//        BarDataSet set3 = new BarDataSet(barThree, "barTwo");
+//        set2.setColor(Color.GREEN);
+//
+//        set1.setHighlightEnabled(false);
+//        set2.setHighlightEnabled(false);
+//        set3.setHighlightEnabled(false);
+//        set1.setDrawValues(false);
+//        set2.setDrawValues(false);
+//        set3.setDrawValues(false);
+//
+//        ArrayList<IBarDataSet> dataSets = new ArrayList<IBarDataSet>();
+//        dataSets.add(set1);
+//        dataSets.add(set2);
+//        dataSets.add(set3);
+//        BarData data = new BarData(dataSets);
+//        float groupSpace = 0.4f;
+//        float barSpace = 0f;
+//        float barWidth = 0.3f;
+//        // (barSpace + barWidth) * 2 + groupSpace = 1
+//        data.setBarWidth(barWidth);
+//        // so that the entire chart is shown when scrolled from right to left
+//        xAxis.setAxisMaximum(labels.length - 1.1f);
+//        mChart.setData(data);
+//        mChart.setScaleEnabled(false);
+//        mChart.setVisibleXRangeMaximum(6f);
+//        mChart.groupBars(1f, groupSpace, barSpace);
+//        mChart.invalidate();
+//
+//    }
 
     public void showPieChart(){
         pieChart = findViewById(R.id.pieChart_view);
@@ -166,7 +170,7 @@ public class MainActivity extends AppCompatActivity {
 
         //input data and fit data into pie chart entry
         for(String type: typeAmountMap.keySet()){
-            pieEntries.add(new PieEntry(typeAmountMap.get(type).floatValue(), type));
+            pieEntries.add(new PieEntry(Objects.requireNonNull(typeAmountMap.get(type)).floatValue(), type));
         }
 
         //collecting the entries with label name
@@ -184,6 +188,7 @@ public class MainActivity extends AppCompatActivity {
         pieChart.invalidate();
     }
 
+    @SuppressLint("SetTextI18n")
     public void loadChartValue(){
         RequestQueue queue = Volley.newRequestQueue(this);
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, CHART_URL, null, response -> {
