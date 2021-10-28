@@ -4,10 +4,13 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -35,26 +38,29 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
-    BarChart mChart;
-    PieChart pieChart;
+    private BarChart mChart;
+    private PieChart pieChart;
     private static final String CHART_URL = "http://192.168.0.104:13306/GetData5.php";
     private static final String DCARD_URL = "http://192.168.0.104:13306/GetData4.php";
-    List<Chart> chartList;
+    private List<Chart> chartList;
     private TextView mText;
-    private Integer neg, neu, pos;
-    private Integer posCount = 0, neuCount = 0, negCount = 0;
+    private Integer neg, neu, pos, posCount, neuCount, negCount;
+    private String elementToFound_pos = "Positive", elementToFound_neu = "Neutral", elementToFound_neg = "Negative";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         chartList = new ArrayList<>();
+        mText = findViewById(R.id.textView);
         loadChartValue();
 //        GroupBarChart();
         showPieChart();
@@ -139,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void showPieChart(){
+    public void showPieChart(){
         pieChart = findViewById(R.id.pieChart_view);
         pieChart.getDescription().setEnabled(false);
 
@@ -178,42 +184,32 @@ public class MainActivity extends AppCompatActivity {
         pieChart.invalidate();
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
-    public <T> Map<T, Long> countByForEachLoopWithGetOrDefault(List<T> inputList) {
-        Map<T, Long> resultMap = new HashMap<>();
-        inputList.forEach(e -> resultMap.put(e, resultMap.getOrDefault(e, 0L) + 1L));
-        return resultMap;
-    }
-
-    private void loadChartValue(){
+    public void loadChartValue(){
         RequestQueue queue = Volley.newRequestQueue(this);
-        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, CHART_URL, null, new Response.Listener<JSONArray>() {
-            @Override
-            public void onResponse(JSONArray response) {
-                for (int i = 0; i < response.length(); i++) {
-                    try {
-                        JSONObject chartObject = response.getJSONObject(i);
-
-                        Chart chart = new Chart();
-                        chart.setSaScore(chartObject.getString("SA_Score"));
-                        chart.setSaClass(chartObject.getString("SA_Class"));
-                        chartList.add(chart);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
+        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, CHART_URL, null, response -> {
+            for (int i = 0; i < response.length(); i++) {
+                try {
+                    JSONObject chartObject = response.getJSONObject(i);
+                    Chart chart = new Chart();
+                    chart.setSaScore(chartObject.getString("SA_Score"));
+                    chart.setSaClass(chartObject.getString("SA_Class"));
+                    chartList.add(chart);
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
-                mText = findViewById(R.id.textView);
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
+            posCount = Collections.frequency(chartList, elementToFound_pos);
+            neuCount = Collections.frequency(chartList, elementToFound_neu);
+            negCount = Collections.frequency(chartList, elementToFound_neg);
+        }, error -> {
 
-            }
         });
-        pos = 60;
-        neu = 10;
-        neg = 40;
         queue.add(jsonArrayRequest);
+
+        mText.setText("Positive: " + posCount + "Neutral: " + neuCount + "Negative: " + negCount);
+        pos = 10;
+        neu = 10;
+        neg = 10;
     }
 
 }
