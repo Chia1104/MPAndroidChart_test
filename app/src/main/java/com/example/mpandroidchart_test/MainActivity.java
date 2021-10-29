@@ -1,44 +1,28 @@
 package com.example.mpandroidchart_test;
 
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
-import android.widget.Button;
+import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.PieChart;
-import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.components.YAxis;
-import com.github.mikephil.charting.data.BarData;
-import com.github.mikephil.charting.data.BarDataSet;
-import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
-import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
-import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -47,16 +31,16 @@ import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
 
-    private BarChart mChart;
-    private PieChart pieChart;
+    BarChart mChart;
+    PieChart pieChart;
     private static final String CHART_URL = "http://192.168.0.104:13306/GetData5.php";
     private static final String DCARD_URL = "http://192.168.0.104:13306/GetData4.php";
+    private static final String elementToFound_pos = "Positive";
+    private static final String elementToFound_neu = "Neutral";
+    private static final String elementToFound_neg = "Negative";
     private List<Chart> chartList;
     private TextView mText;
-    private Integer neg, neu, pos, posCount, neuCount, negCount;
-    private final String elementToFound_pos = "Positive";
-    private final String elementToFound_neu = "Neutral";
-    private final String elementToFound_neg = "Negative";
+    private Integer neg, neu, pos;
 
 
     @Override
@@ -66,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
         chartList = new ArrayList<>();
         mText = findViewById(R.id.textView);
         loadChartValue();
+        countClass();
 //        GroupBarChart();
         showPieChart();
     }
@@ -203,18 +188,63 @@ public class MainActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
             }
-            posCount = Collections.frequency(chartList, elementToFound_pos);
-            neuCount = Collections.frequency(chartList, elementToFound_neu);
-            negCount = Collections.frequency(chartList, elementToFound_neg);
+
+            refreshData();
         }, error -> {
 
         });
         queue.add(jsonArrayRequest);
 
-        mText.setText("Positive: " + posCount + "Neutral: " + neuCount + "Negative: " + negCount);
         pos = 10;
         neu = 10;
         neg = 10;
+    }
+
+    public void refreshData() {
+
+        if (chartList.isEmpty()) {
+            pieChart.setVisibility(android.view.View.VISIBLE);
+        } else {
+            pieChart.setVisibility(android.view.View.GONE);
+        }
+    }
+
+    public void countClass() {
+
+        //test
+//        List<String> testList = Arrays.asList(
+//                "Chennai","Bangalore","Pune","Hyderabad",
+//                "Chennai","Pune","Mysore","Delhi","Hyderabad",
+//                "Pune"
+//        );
+//        String testElementToFound = "Chennai";
+//        int frequency = Collections.frequency(testList, testElementToFound);
+//        mText.setText("frequency: " + frequency);
+
+        //using Collections
+        int posCount = Collections.frequency(chartList, elementToFound_pos);
+        int neuCount = Collections.frequency(chartList, elementToFound_neu);
+        int negCount = Collections.frequency(chartList, elementToFound_neg);
+        pos = posCount;
+        neu = neuCount;
+        neg = negCount;
+
+        //using Map
+//        HashMap<Chart, Integer> map = new HashMap<>();
+//        for(Chart s : chartList)
+//        {
+//            map.put(s, map.get(s)!=null ? map.get(s)+1 : 1);
+//        }
+//        try{
+//            int posCount = map.get(elementToFound_pos);
+//            int neuCount = map.get(elementToFound_neu);
+//            int negCount = map.get(elementToFound_neg);
+//            mText.setText(posCount + neuCount + negCount);
+//        } catch (Exception e){
+//            mText.setText(e + "");
+//        }
+
+
     }
 
 }
