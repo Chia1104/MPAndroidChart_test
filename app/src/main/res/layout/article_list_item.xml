@@ -7,6 +7,36 @@
     android:layout_height="wrap_content">
 
     <TextView
+        android:id="@+id/lv3_txtView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="56dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:text="TextView"
+        android:textSize="5sp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/id_txtView"
+        app:layout_constraintTop_toBottomOf="@+id/content_txtView"
+        app:layout_constraintVertical_bias="0.538" />
+
+    <TextView
+        android:id="@+id/lv2_txtView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="28dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:text="TextView"
+        android:textSize="5sp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/id_txtView"
+        app:layout_constraintTop_toBottomOf="@+id/content_txtView"
+        app:layout_constraintVertical_bias="0.538" />
+
+    <TextView
         android:id="@+id/class_txtView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -70,6 +100,34 @@
         android:text="TextView"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@+id/class_txtView"
+        app:layout_constraintTop_toBottomOf="@+id/content_txtView" />
+
+    <TextView
+        android:id="@+id/id_txtView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="3dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:text="TextView"
+        android:textSize="5sp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/score_txtView"
+        app:layout_constraintTop_toBottomOf="@+id/content_txtView" />
+
+    <TextView
+        android:id="@+id/lv1_txtView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="3dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:text="TextView"
+        android:textSize="5sp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/id_txtView"
         app:layout_constraintTop_toBottomOf="@+id/content_txtView" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -6,16 +6,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
-import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.PieChart;
@@ -33,6 +28,7 @@ import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -60,7 +56,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         mRecyclerView = findViewById(R.id.recyclerView);
         dcardList = new ArrayList<>();
-        loadDcard();
+//        loadDcard();
+        loadDcardWithVolley();
         countClass();
         showPieChart();
     }
@@ -184,7 +181,7 @@ public class MainActivity extends AppCompatActivity {
         pieChart.invalidate();
     }
 
-    public void loadDcard(){
+    public void loadDcardWithVolley(){
         RequestQueue queue = Volley.newRequestQueue(this);
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, DCARD_URL, null, response -> {
             try {
@@ -196,6 +193,10 @@ public class MainActivity extends AppCompatActivity {
                     dcard.setTitle(dcardObject.getString("Title"));
                     dcard.setDate(dcardObject.getString("CreatedAt"));
                     dcard.setContent(dcardObject.getString("Content"));
+                    dcard.setId(dcardObject.getString("Id"));
+                    dcard.setLv1(dcardObject.getString("KeywordLevel1"));
+                    dcard.setLv2(dcardObject.getString("KeywordLevel2"));
+                    dcard.setLv3(dcardObject.getString("KeywordLevel3"));
                     dcardList.add(dcard);
                 }
             } catch (JSONException e) {
@@ -212,17 +213,35 @@ public class MainActivity extends AppCompatActivity {
         queue.add(jsonArrayRequest);
     }
 
+//    public void loadDcard(){
+//        new Thread(() -> {
+//            MysqlCon con = new MysqlCon();
+//            con.run();
+////            try {
+////                final List<Dcard> dcardList = con.getArticle();
+////                Toast.makeText(MainActivity.this, "" + dcardList,Toast.LENGTH_LONG).show();
+////                mRecyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+////                adapter = new Adapter(getApplicationContext(), dcardList);
+////                mRecyclerView.setAdapter(adapter);
+////            } catch (SQLException throwables) {
+////                Toast.makeText(MainActivity.this, "" + throwables,Toast.LENGTH_LONG).show();
+////                throwables.printStackTrace();
+////            }
+//
+//        }).start();
+//    }
+
     public void countClass() {
 
         //using Collections
-        int posCount = Collections.frequency(dcardList, elementToFound_pos);
-        int neuCount = Collections.frequency(dcardList, elementToFound_neu);
-        int negCount = Collections.frequency(dcardList, elementToFound_neg);
+//        int posCount = Collections.frequency(dcardList, elementToFound_pos);
+//        int neuCount = Collections.frequency(dcardList, elementToFound_neu);
+//        int negCount = Collections.frequency(dcardList, elementToFound_neg);
 
-        pos = posCount;
-        neu = neuCount;
-        neg = negCount;
-        Toast.makeText(MainActivity.this, "Positive: " + posCount + " Neutral: " + neuCount + " Negative: " + negCount,Toast.LENGTH_LONG).show();
+        pos = 10;
+        neu = 10;
+        neg = 10;
+//        Toast.makeText(MainActivity.this, "Positive: " + posCount + " Neutral: " + neuCount + " Negative: " + negCount,Toast.LENGTH_LONG).show();
     }
 
 }

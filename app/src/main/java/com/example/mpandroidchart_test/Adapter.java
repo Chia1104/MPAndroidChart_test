@@ -14,15 +14,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
-public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder>{
-
+public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
     LayoutInflater inflater;
     List<Dcard> dcards;
-    Integer posCount = 0;
-    Integer neuCount = 0;
-    Integer negCount = 0;
+    private Context mContext;
 
     public Adapter(Context context, List<Dcard> dcards) {
+        this.mContext = context;
         this.inflater = LayoutInflater.from(context);
         this.dcards = dcards;
     }
@@ -33,6 +31,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder>{
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = inflater.inflate(R.layout.article_list_item, parent, false);
         return new ViewHolder(view);
+
     }
 
     @Override
@@ -42,21 +41,22 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder>{
         holder.mContent.setText(dcards.get(position).getContent());
         holder.mScore.setText(dcards.get(position).getSascore());
         holder.mClass.setText(dcards.get(position).getSaclass());
+        holder.mLv1.setText(dcards.get(position).getLv1());
+        holder.mLv2.setText(dcards.get(position).getLv2());
+        holder.mLv3.setText(dcards.get(position).getLv3());
+        holder.mId.setText(dcards.get(position).getId());
         switch (holder.mClass.getText().toString()){
             case "Positive":
                 holder.mScore.setTextColor(Color.parseColor("#33FFAA"));
                 holder.mClass.setTextColor(Color.parseColor("#33FFAA"));
-                posCount += 1;
                 break;
             case "Neutral":
                 holder.mScore.setTextColor(Color.parseColor("#FFDD55"));
                 holder.mClass.setTextColor(Color.parseColor("#FFDD55"));
-                neuCount += 1;
                 break;
             case "Negative":
                 holder.mScore.setTextColor(Color.parseColor("#FFA488"));
                 holder.mClass.setTextColor(Color.parseColor("#FFA488"));
-                negCount += 1;
                 break;
         }
     }
@@ -66,8 +66,8 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder>{
         return dcards.size();
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder{
-        public TextView mTitle, mDate, mContent, mScore, mClass;
+    public class ViewHolder extends RecyclerView.ViewHolder{
+        public TextView mTitle, mDate, mContent, mScore, mClass, mLv1, mLv2, mLv3, mId;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             mTitle = itemView.findViewById(R.id.title_txtView);
@@ -75,26 +75,32 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder>{
             mContent = itemView.findViewById(R.id.content_txtView);
             mScore = itemView.findViewById(R.id.score_txtView);
             mClass = itemView.findViewById(R.id.class_txtView);
+            mLv1 = itemView.findViewById(R.id.lv1_txtView);
+            mLv2 = itemView.findViewById(R.id.lv2_txtView);
+            mLv3 = itemView.findViewById(R.id.lv3_txtView);
+            mId = itemView.findViewById(R.id.id_txtView);
 
-//            itemView.setOnClickListener(v -> {
-//                try {
-//                    Intent intent = new Intent(mContext, DcardDetailActivity.class);
-//                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//                    intent.putExtra("title", mTitle.getText().toString());
-//                    intent.putExtra("content", mContent.getText().toString());
-//                    intent.putExtra("date", mDate.getText().toString());
-//                    intent.putExtra("sascore", mScore.getText().toString());
-//                    intent.putExtra("saclass", mClass.getText().toString());
-//                    mContext.startActivity(intent);
-//                    Toast.makeText(mContext,
-//                            "clicked",Toast.LENGTH_SHORT).show();
-//                }
-//                catch(Exception e) {
-//                    Toast.makeText(mContext,
-//                            "error" + e,Toast.LENGTH_SHORT).show();
-//                }
-//
-//            });
+            itemView.setOnClickListener(v -> {
+                try {
+                    Intent intent = new Intent(mContext, DcardDetailActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    intent.putExtra("title", mTitle.getText().toString());
+                    intent.putExtra("content", mContent.getText().toString());
+                    intent.putExtra("date", mDate.getText().toString());
+                    intent.putExtra("saclass", mClass.getText().toString());
+                    intent.putExtra("sascore", mScore.getText().toString());
+                    intent.putExtra("lv1", mLv1.getText().toString());
+                    intent.putExtra("lv2", mLv2.getText().toString());
+                    intent.putExtra("lv3", mLv3.getText().toString());
+                    intent.putExtra("id", mId.getText().toString());
+                    mContext.startActivity(intent);
+                }
+                catch(Exception e) {
+                    Toast.makeText(mContext,
+                            "error" + e,Toast.LENGTH_SHORT).show();
+                }
+
+            });
 
         }
     }
