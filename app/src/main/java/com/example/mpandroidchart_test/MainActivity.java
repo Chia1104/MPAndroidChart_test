@@ -4,7 +4,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.ProgressDialog;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.widget.Toast;
 
@@ -28,7 +30,13 @@ import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -49,17 +57,100 @@ public class MainActivity extends AppCompatActivity {
     RecyclerView mRecyclerView;
     Adapter adapter;
 
+    boolean success = false;
+    MysqlCon con;
+    RecyclerView.LayoutManager mLayoutManager;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mRecyclerView = findViewById(R.id.recyclerView);
+
+        mRecyclerView.setHasFixedSize(true);
+        mLayoutManager = new LinearLayoutManager(this);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        con = new MysqlCon();
+
         dcardList = new ArrayList<>();
-//        loadDcard();
-        loadDcardWithVolley();
+
+        SyncData orderData = new SyncData();
+        orderData.execute("");
+
         countClass();
         showPieChart();
+    }
+
+    private class SyncData extends AsyncTask<String, String, String>{
+
+        String msg = "Internet/DB_Credentials/Windows_FireWall_TurnOn ERROR, See Android Monitor in the bottom for details!";
+        ProgressDialog progress;
+
+        @Override
+        protected void onPreExecute() {
+            progress = ProgressDialog.show(MainActivity.this, "Synchronising", "RecycleView Loading, Please Wait...", true);
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            try {
+                Connection conn = con.CONN();
+                if (conn == null){
+                    success = false;
+                } else {
+                    String query = "SELECT dcard_rawdata.Id, dcard_rawdata.Title, dcard_rawdata.CreatedAt, dcard_rawdata.Content, nlp_analysis.SA_Score, nlp_analysis.SA_Class, comparison.Level, comparison.KeywordLevel1, comparison.KeywordLevel2, comparison.KeywordLevel3 FROM dcard_rawdata JOIN nlp_analysis ON dcard_rawdata.Id = nlp_analysis.Id JOIN comparison ON comparison.Id = nlp_analysis.Id WHERE dcard_rawdata.Id = nlp_analysis.Id ORDER BY  dcard_rawdata.Id DESC";
+                    Statement st = conn.createStatement();
+                    ResultSet rs = st.executeQuery(query);
+                    if (rs != null) {
+                        while (rs.next()){
+                            try {
+                                Dcard dcard = new Dcard();
+                                dcard.setSascore(rs.getString("SA_Score"));
+                                dcard.setSaclass(rs.getString("SA_Class"));
+                                dcard.setTitle(rs.getString("Title"));
+                                dcard.setDate(rs.getString("CreatedAt"));
+                                dcard.setContent(rs.getString("Content"));
+                                dcard.setId(rs.getString("Id"));
+                                dcard.setLv1(rs.getString("KeywordLevel1"));
+                                dcard.setLv2(rs.getString("KeywordLevel2"));
+                                dcard.setLv3(rs.getString("KeywordLevel3"));
+                                dcardList.add(dcard);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        msg = "FOUND";
+                        success = true;
+                    } else {
+                        msg = "NO DATA FOUND!";
+                        success = false;
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                Writer writer = new StringWriter();
+                e.printStackTrace(new PrintWriter(writer));
+                msg = writer.toString();
+                success = false;
+            }
+            return msg;
+        }
+
+        protected void onPostExecute(String msg) {
+            progress.dismiss();
+            Toast.makeText(MainActivity.this, "" + msg,Toast.LENGTH_LONG).show();
+            if (success == false) {
+
+            } else {
+                try {
+                    adapter = new Adapter(getApplicationContext(), dcardList);
+                    mRecyclerView.setAdapter(adapter);
+                } catch (Exception e) {
+
+                }
+            }
+        }
     }
 
     public void GroupBarChart(){
@@ -213,23 +304,20 @@ public class MainActivity extends AppCompatActivity {
         queue.add(jsonArrayRequest);
     }
 
-//    public void loadDcard(){
-//        new Thread(() -> {
-//            MysqlCon con = new MysqlCon();
-//            con.run();
-////            try {
-////                final List<Dcard> dcardList = con.getArticle();
-////                Toast.makeText(MainActivity.this, "" + dcardList,Toast.LENGTH_LONG).show();
-////                mRecyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-////                adapter = new Adapter(getApplicationContext(), dcardList);
-////                mRecyclerView.setAdapter(adapter);
-////            } catch (SQLException throwables) {
-////                Toast.makeText(MainActivity.this, "" + throwables,Toast.LENGTH_LONG).show();
-////                throwables.printStackTrace();
-////            }
-//
-//        }).start();
-//    }
+    public void loadDcardWithJDBCTry(){
+        new Thread(() -> {
+            MysqlCon con = new MysqlCon();
+            try {
+                final List<Dcard> dcardList = con.getArticle();
+                mRecyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+                adapter = new Adapter(getApplicationContext(), dcardList);
+                mRecyclerView.setAdapter(adapter);
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+
+        }).start();
+    }
 
     public void countClass() {
 
