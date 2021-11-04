@@ -53,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String elementToFound_neu = "Neutral";
     private static final String elementToFound_neg = "Negative";
     List<Dcard> dcardList;
+    List<String> chartValue;
     Integer neg, neu, pos;
     RecyclerView mRecyclerView;
     Adapter adapter;
@@ -74,12 +75,16 @@ public class MainActivity extends AppCompatActivity {
         con = new MysqlCon();
 
         dcardList = new ArrayList<>();
+        chartValue = new ArrayList<>();
 
         SyncData orderData = new SyncData();
         orderData.execute("");
 
-        countClass();
-        showPieChart();
+        SyncData1 orderData1 = new SyncData1();
+        orderData1.execute("");
+
+//        countClass();
+//        showPieChart();
     }
 
     private class SyncData extends AsyncTask<String, String, String>{
@@ -146,6 +151,76 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     adapter = new Adapter(getApplicationContext(), dcardList);
                     mRecyclerView.setAdapter(adapter);
+                } catch (Exception e) {
+
+                }
+            }
+        }
+    }
+
+    private class SyncData1 extends AsyncTask<String, String, String>{
+
+        String msg = "Internet/DB_Credentials/Windows_FireWall_TurnOn ERROR, See Android Monitor in the bottom for details!";
+        ProgressDialog progress;
+        List<String> chartList = new ArrayList<>();
+
+        @Override
+        protected void onPreExecute() {
+            progress = ProgressDialog.show(MainActivity.this, "Synchronising", "RecycleView Loading, Please Wait...", true);
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            try {
+                Connection conn = con.CONN();
+                if (conn == null){
+                    success = false;
+                } else {
+                    String query = "SELECT dcard_rawdata.Id, dcard_rawdata.Title, dcard_rawdata.CreatedAt, dcard_rawdata.Content, nlp_analysis.SA_Score, nlp_analysis.SA_Class, comparison.Level, comparison.KeywordLevel1, comparison.KeywordLevel2, comparison.KeywordLevel3 FROM dcard_rawdata JOIN nlp_analysis ON dcard_rawdata.Id = nlp_analysis.Id JOIN comparison ON comparison.Id = nlp_analysis.Id WHERE dcard_rawdata.Id = nlp_analysis.Id ORDER BY  dcard_rawdata.Id DESC";
+                    Statement st = conn.createStatement();
+                    ResultSet rs = st.executeQuery(query);
+                    if (rs != null) {
+                        while (rs.next()){
+                            try {
+                                chartList.add(rs.getString("SA_Class"));
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        msg = "FOUND";
+                        success = true;
+                    } else {
+                        msg = "NO DATA FOUND!";
+                        success = false;
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                Writer writer = new StringWriter();
+                e.printStackTrace(new PrintWriter(writer));
+                msg = writer.toString();
+                success = false;
+            }
+            return msg;
+        }
+
+        protected void onPostExecute(String msg) {
+            progress.dismiss();
+            Toast.makeText(MainActivity.this, "" + msg,Toast.LENGTH_LONG).show();
+            if (success == false) {
+
+            } else {
+                try {
+                    int posCount = Collections.frequency(chartList, elementToFound_pos);
+                    int neuCount = Collections.frequency(chartList, elementToFound_neu);
+                    int negCount = Collections.frequency(chartList, elementToFound_neg);
+
+                    pos = posCount;
+                    neu = neuCount;
+                    neg = negCount;
+
+                    showPieChart();
+
                 } catch (Exception e) {
 
                 }
@@ -322,9 +397,9 @@ public class MainActivity extends AppCompatActivity {
     public void countClass() {
 
         //using Collections
-//        int posCount = Collections.frequency(dcardList, elementToFound_pos);
-//        int neuCount = Collections.frequency(dcardList, elementToFound_neu);
-//        int negCount = Collections.frequency(dcardList, elementToFound_neg);
+        int posCount = Collections.frequency(dcardList, elementToFound_pos);
+        int neuCount = Collections.frequency(dcardList, elementToFound_neu);
+        int negCount = Collections.frequency(dcardList, elementToFound_neg);
 
         pos = 10;
         neu = 10;
