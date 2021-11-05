@@ -364,6 +364,7 @@ public class MainActivity extends AppCompatActivity {
         //showing the value of the entries, default true if not set
         pieData.setDrawValues(true);
 
+//        pieChart.setDrawSliceText(false);
         pieChart.setData(pieData);
         pieChart.notifyDataSetChanged();
         pieChart.invalidate();
@@ -372,14 +373,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onValueSelected(Entry e, Highlight h) {
                 e.getData();
-                Toast.makeText(MainActivity.this, "Value: " + e.getY() + ", xIndex: " + e.getX()
-                        + ", DataSet index: " + h.getDataSetIndex(), Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this, "Value: " + e.getY() + ", xIndex: " + h.getX(), Toast.LENGTH_LONG).show();
             }
 
             @Override
             public void onNothingSelected() {
-                Toast.makeText(MainActivity.this, "nothing selected X is ", Toast.LENGTH_LONG).show();
-
+                Toast.makeText(MainActivity.this, "nothing selected", Toast.LENGTH_LONG).show();
             }
         });
     }
