@@ -8,6 +8,10 @@ import android.app.ProgressDialog;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -21,11 +25,14 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
+import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -41,6 +48,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
@@ -62,12 +70,32 @@ public class MainActivity extends AppCompatActivity {
     MysqlCon con;
     RecyclerView.LayoutManager mLayoutManager;
 
+    EditText edtxt;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mRecyclerView = findViewById(R.id.recyclerView);
+
+        edtxt = findViewById(R.id.search_EdText);
+        edtxt.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                filter(s.toString());
+            }
+        });
 
         mRecyclerView.setHasFixedSize(true);
         mLayoutManager = new LinearLayoutManager(this);
@@ -80,17 +108,26 @@ public class MainActivity extends AppCompatActivity {
         SyncData orderData = new SyncData();
         orderData.execute("");
 
-        SyncData1 orderData1 = new SyncData1();
-        orderData1.execute("");
+    }
 
-//        countClass();
-//        showPieChart();
+    private void filter(String text) {
+        ArrayList<Dcard> filteredList = new ArrayList<>();
+
+        for (Dcard item : dcardList) {
+            if (item.getTitle().toLowerCase().contains(text.toLowerCase())) {
+                filteredList.add(item);
+            } else if (item.getContent().toLowerCase().contains(text.toLowerCase())) {
+                filteredList.add(item);
+            }
+        }
+        adapter.filterList(filteredList);
     }
 
     private class SyncData extends AsyncTask<String, String, String>{
 
         String msg = "Internet/DB_Credentials/Windows_FireWall_TurnOn ERROR, See Android Monitor in the bottom for details!";
         ProgressDialog progress;
+        List<String> chartList = new ArrayList<>();
 
         @Override
         protected void onPreExecute() {
@@ -121,6 +158,7 @@ public class MainActivity extends AppCompatActivity {
                                 dcard.setLv2(rs.getString("KeywordLevel2"));
                                 dcard.setLv3(rs.getString("KeywordLevel3"));
                                 dcardList.add(dcard);
+                                chartList.add(rs.getString("SA_Class"));
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
@@ -151,66 +189,7 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     adapter = new Adapter(getApplicationContext(), dcardList);
                     mRecyclerView.setAdapter(adapter);
-                } catch (Exception e) {
 
-                }
-            }
-        }
-    }
-
-    private class SyncData1 extends AsyncTask<String, String, String>{
-
-        String msg = "Internet/DB_Credentials/Windows_FireWall_TurnOn ERROR, See Android Monitor in the bottom for details!";
-        ProgressDialog progress;
-        List<String> chartList = new ArrayList<>();
-
-        @Override
-        protected void onPreExecute() {
-            progress = ProgressDialog.show(MainActivity.this, "Synchronising", "RecycleView Loading, Please Wait...", true);
-        }
-
-        @Override
-        protected String doInBackground(String... strings) {
-            try {
-                Connection conn = con.CONN();
-                if (conn == null){
-                    success = false;
-                } else {
-                    String query = "SELECT dcard_rawdata.Id, dcard_rawdata.Title, dcard_rawdata.CreatedAt, dcard_rawdata.Content, nlp_analysis.SA_Score, nlp_analysis.SA_Class, comparison.Level, comparison.KeywordLevel1, comparison.KeywordLevel2, comparison.KeywordLevel3 FROM dcard_rawdata JOIN nlp_analysis ON dcard_rawdata.Id = nlp_analysis.Id JOIN comparison ON comparison.Id = nlp_analysis.Id WHERE dcard_rawdata.Id = nlp_analysis.Id ORDER BY  dcard_rawdata.Id DESC";
-                    Statement st = conn.createStatement();
-                    ResultSet rs = st.executeQuery(query);
-                    if (rs != null) {
-                        while (rs.next()){
-                            try {
-                                chartList.add(rs.getString("SA_Class"));
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        }
-                        msg = "FOUND";
-                        success = true;
-                    } else {
-                        msg = "NO DATA FOUND!";
-                        success = false;
-                    }
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                Writer writer = new StringWriter();
-                e.printStackTrace(new PrintWriter(writer));
-                msg = writer.toString();
-                success = false;
-            }
-            return msg;
-        }
-
-        protected void onPostExecute(String msg) {
-            progress.dismiss();
-            Toast.makeText(MainActivity.this, "" + msg,Toast.LENGTH_LONG).show();
-            if (success == false) {
-
-            } else {
-                try {
                     int posCount = Collections.frequency(chartList, elementToFound_pos);
                     int neuCount = Collections.frequency(chartList, elementToFound_neu);
                     int negCount = Collections.frequency(chartList, elementToFound_neg);
@@ -220,7 +199,6 @@ public class MainActivity extends AppCompatActivity {
                     neg = negCount;
 
                     showPieChart();
-
                 } catch (Exception e) {
 
                 }
@@ -345,6 +323,21 @@ public class MainActivity extends AppCompatActivity {
         pieChart.setData(pieData);
         pieChart.notifyDataSetChanged();
         pieChart.invalidate();
+
+        pieChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
+            @Override
+            public void onValueSelected(Entry e, Highlight h) {
+                e.getData();
+                Toast.makeText(MainActivity.this, "Value: " + e.getY() + ", xIndex: " + e.getX()
+                        + ", DataSet index: " + h.getDataSetIndex(), Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onNothingSelected() {
+                Toast.makeText(MainActivity.this, "nothing selected X is ", Toast.LENGTH_LONG).show();
+
+            }
+        });
     }
 
     public void loadDcardWithVolley(){
@@ -379,32 +372,5 @@ public class MainActivity extends AppCompatActivity {
         queue.add(jsonArrayRequest);
     }
 
-    public void loadDcardWithJDBCTry(){
-        new Thread(() -> {
-            MysqlCon con = new MysqlCon();
-            try {
-                final List<Dcard> dcardList = con.getArticle();
-                mRecyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-                adapter = new Adapter(getApplicationContext(), dcardList);
-                mRecyclerView.setAdapter(adapter);
-            } catch (SQLException throwables) {
-                throwables.printStackTrace();
-            }
-
-        }).start();
-    }
-
-    public void countClass() {
-
-        //using Collections
-        int posCount = Collections.frequency(dcardList, elementToFound_pos);
-        int neuCount = Collections.frequency(dcardList, elementToFound_neu);
-        int negCount = Collections.frequency(dcardList, elementToFound_neg);
-
-        pos = 10;
-        neu = 10;
-        neg = 10;
-//        Toast.makeText(MainActivity.this, "Positive: " + posCount + " Neutral: " + neuCount + " Negative: " + negCount,Toast.LENGTH_LONG).show();
-    }
 
 }

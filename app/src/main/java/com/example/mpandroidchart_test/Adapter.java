@@ -12,6 +12,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
@@ -103,5 +104,10 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
             });
 
         }
+    }
+
+    public void filterList(ArrayList<Dcard> filteredList) {
+        dcards = filteredList;
+        notifyDataSetChanged();
     }
 }
