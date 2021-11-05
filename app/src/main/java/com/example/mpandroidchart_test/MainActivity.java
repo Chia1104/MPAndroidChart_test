@@ -108,6 +108,8 @@ public class MainActivity extends AppCompatActivity {
         SyncData orderData = new SyncData();
         orderData.execute("");
 
+//        loadDcardWithVolley();
+
     }
 
     private void filter(String text) {
@@ -204,6 +206,48 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
+    }
+
+    public void loadDcardWithVolley(){
+        RequestQueue queue = Volley.newRequestQueue(this);
+        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, DCARD_URL, null, response -> {
+            try {
+                for (int i = 0; i < response.length(); i++) {
+                    JSONObject dcardObject = response.getJSONObject(i);
+                    Dcard dcard = new Dcard();
+                    dcard.setSascore(dcardObject.getString("SA_Score"));
+                    dcard.setSaclass(dcardObject.getString("SA_Class"));
+                    dcard.setTitle(dcardObject.getString("Title"));
+                    dcard.setDate(dcardObject.getString("CreatedAt"));
+                    dcard.setContent(dcardObject.getString("Content"));
+                    dcard.setId(dcardObject.getString("Id"));
+                    dcard.setLv1(dcardObject.getString("KeywordLevel1"));
+                    dcard.setLv2(dcardObject.getString("KeywordLevel2"));
+                    dcard.setLv3(dcardObject.getString("KeywordLevel3"));
+                    dcardList.add(dcard);
+                    chartValue.add(dcardObject.getString("SA_Class"));
+                }
+            } catch (JSONException e) {
+                Toast.makeText(MainActivity.this, e.getMessage(),Toast.LENGTH_LONG).show();
+                e.printStackTrace();
+            }
+            mRecyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+            adapter = new Adapter(getApplicationContext(), dcardList);
+            mRecyclerView.setAdapter(adapter);
+            int posCount = Collections.frequency(chartValue, elementToFound_pos);
+            int neuCount = Collections.frequency(chartValue, elementToFound_neu);
+            int negCount = Collections.frequency(chartValue, elementToFound_neg);
+
+            pos = posCount;
+            neu = neuCount;
+            neg = negCount;
+
+            showPieChart();
+        }, error -> {
+            Toast.makeText(MainActivity.this, error.getMessage(),Toast.LENGTH_LONG).show();
+            error.printStackTrace();
+        });
+        queue.add(jsonArrayRequest);
     }
 
     public void GroupBarChart(){
@@ -339,38 +383,5 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
-    public void loadDcardWithVolley(){
-        RequestQueue queue = Volley.newRequestQueue(this);
-        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, DCARD_URL, null, response -> {
-            try {
-                for (int i = 0; i < response.length(); i++) {
-                    JSONObject dcardObject = response.getJSONObject(i);
-                    Dcard dcard = new Dcard();
-                    dcard.setSascore(dcardObject.getString("SA_Score"));
-                    dcard.setSaclass(dcardObject.getString("SA_Class"));
-                    dcard.setTitle(dcardObject.getString("Title"));
-                    dcard.setDate(dcardObject.getString("CreatedAt"));
-                    dcard.setContent(dcardObject.getString("Content"));
-                    dcard.setId(dcardObject.getString("Id"));
-                    dcard.setLv1(dcardObject.getString("KeywordLevel1"));
-                    dcard.setLv2(dcardObject.getString("KeywordLevel2"));
-                    dcard.setLv3(dcardObject.getString("KeywordLevel3"));
-                    dcardList.add(dcard);
-                }
-            } catch (JSONException e) {
-                Toast.makeText(MainActivity.this, e.getMessage(),Toast.LENGTH_LONG).show();
-                e.printStackTrace();
-            }
-            mRecyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-            adapter = new Adapter(getApplicationContext(), dcardList);
-            mRecyclerView.setAdapter(adapter);
-        }, error -> {
-            Toast.makeText(MainActivity.this, error.getMessage(),Toast.LENGTH_LONG).show();
-            error.printStackTrace();
-        });
-        queue.add(jsonArrayRequest);
-    }
-
 
 }
