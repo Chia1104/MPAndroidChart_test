@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
 
     BarChart mChart;
     PieChart pieChart;
-    private static final String DCARD_URL = "https://cguimfinalproject-test.herokuapp.com/";
+    private static final String DCARD_URL = "https://cguimfinalproject-test.herokuapp.com/GetData5.php";
     private static final String elementToFound_pos = "Positive";
     private static final String elementToFound_neu = "Neutral";
     private static final String elementToFound_neg = "Negative";
