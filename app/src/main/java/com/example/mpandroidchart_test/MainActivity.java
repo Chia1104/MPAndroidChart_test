@@ -49,6 +49,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -127,6 +128,17 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         adapter.filterList(filteredList);
+    }
+
+    private void filter1(String text) {
+        ArrayList<Dcard> filteredList1 = new ArrayList<>();
+
+        for (Dcard item : dcardList) {
+            if (item.getSaclassnum().toLowerCase().contains(text.toLowerCase())) {
+                filteredList1.add(item);
+            }
+        }
+        adapter.filterList1(filteredList1);
     }
 
     private class SyncData extends AsyncTask<String, String, String>{
@@ -229,6 +241,17 @@ public class MainActivity extends AppCompatActivity {
                     dcard.setLv1(dcardObject.getString("KeywordLevel1"));
                     dcard.setLv2(dcardObject.getString("KeywordLevel2"));
                     dcard.setLv3(dcardObject.getString("KeywordLevel3"));
+                    switch (dcardObject.getString("SA_Class")){
+                        case "Positive":
+                            dcard.setSaclassnum("2.0");
+                            break;
+                        case "Neutral":
+                            dcard.setSaclassnum("0.0");
+                            break;
+                        case "Negative":
+                            dcard.setSaclassnum("1.0");
+                            break;
+                    }
                     dcardList.add(dcard);
                     chartValue.add(dcardObject.getString("SA_Class"));
                 }
@@ -379,12 +402,15 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onValueSelected(Entry e, Highlight h) {
                 e.getData();
-                Toast.makeText(MainActivity.this, "Value: " + e.getY() + ", xIndex: " + h.getX(), Toast.LENGTH_LONG).show();
+                String txt = String.valueOf(h.getX());
+                filter1(txt);
             }
 
             @Override
             public void onNothingSelected() {
-                Toast.makeText(MainActivity.this, "nothing selected", Toast.LENGTH_LONG).show();
+                mRecyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+                adapter = new Adapter(getApplicationContext(), dcardList);
+                mRecyclerView.setAdapter(adapter);
             }
         });
     }

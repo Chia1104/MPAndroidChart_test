@@ -130,4 +130,15 @@
         app:layout_constraintStart_toEndOf="@+id/id_txtView"
         app:layout_constraintTop_toBottomOf="@+id/content_txtView" />
 
+    <TextView
+        android:id="@+id/saclassnum_txtView"
+        android:layout_width="17dp"
+        android:layout_height="7dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="17dp"
+        android:text="TextView"
+        android:visibility="invisible"
+        app:layout_constraintStart_toEndOf="@+id/lv3_txtView"
+        app:layout_constraintTop_toBottomOf="@+id/content_txtView" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

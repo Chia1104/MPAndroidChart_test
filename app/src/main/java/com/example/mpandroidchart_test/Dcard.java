@@ -10,8 +10,9 @@ public class Dcard {
     private String lv1;
     private String lv2;
     private String lv3;
+    private String saclassnum;
 
-    public Dcard(String title, String date, String content, String sascore, String saclass, String id, String lv1, String lv2, String lv3) {
+    public Dcard(String title, String date, String content, String sascore, String saclass, String id, String lv1, String lv2, String lv3, String saclassnum) {
         this.title = title;
         this.date = date;
         this.content = content;
@@ -21,6 +22,7 @@ public class Dcard {
         this.lv1 = lv1;
         this.lv2 = lv2;
         this.lv3 = lv3;
+        this.saclassnum = saclassnum;
     }
 
     public Dcard() {
@@ -96,5 +98,13 @@ public class Dcard {
 
     public void setLv3(String lv3) {
         this.lv3 = lv3;
+    }
+
+    public String getSaclassnum() {
+        return saclassnum;
+    }
+
+    public void setSaclassnum(String saclassnum) {
+        this.saclassnum = saclassnum;
     }
 }

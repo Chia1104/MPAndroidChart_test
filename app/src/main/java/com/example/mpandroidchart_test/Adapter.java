@@ -110,4 +110,9 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
         dcards = filteredList;
         notifyDataSetChanged();
     }
+
+    public void filterList1(ArrayList<Dcard> filteredList1) {
+        dcards = filteredList1;
+        notifyDataSetChanged();
+    }
 }
