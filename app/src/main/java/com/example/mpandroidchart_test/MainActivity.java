@@ -11,7 +11,9 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -56,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
 
     BarChart mChart;
     PieChart pieChart;
-    private static final String DCARD_URL = "http://192.168.0.104:13306/GetData5.php";
+    private static final String DCARD_URL = "https://cguimfinalproject-test.herokuapp.com/";
     private static final String elementToFound_pos = "Positive";
     private static final String elementToFound_neu = "Neutral";
     private static final String elementToFound_neg = "Negative";
@@ -69,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
     boolean success = false;
     MysqlCon con;
     RecyclerView.LayoutManager mLayoutManager;
+    ProgressBar progressBar;
 
     EditText edtxt;
 
@@ -77,6 +80,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        progressBar = findViewById(R.id.progressBar);
         mRecyclerView = findViewById(R.id.recyclerView);
 
         edtxt = findViewById(R.id.search_EdText);
@@ -105,10 +109,10 @@ public class MainActivity extends AppCompatActivity {
         dcardList = new ArrayList<>();
         chartValue = new ArrayList<>();
 
-        SyncData orderData = new SyncData();
-        orderData.execute("");
+//        SyncData orderData = new SyncData();
+//        orderData.execute("");
 
-//        loadDcardWithVolley();
+        loadDcardWithVolley();
 
     }
 
@@ -209,6 +213,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void loadDcardWithVolley(){
+        HttpsTrustManager.allowAllSSL();
         RequestQueue queue = Volley.newRequestQueue(this);
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, DCARD_URL, null, response -> {
             try {
@@ -227,22 +232,23 @@ public class MainActivity extends AppCompatActivity {
                     dcardList.add(dcard);
                     chartValue.add(dcardObject.getString("SA_Class"));
                 }
+                mRecyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+                adapter = new Adapter(getApplicationContext(), dcardList);
+                mRecyclerView.setAdapter(adapter);
+                int posCount = Collections.frequency(chartValue, elementToFound_pos);
+                int neuCount = Collections.frequency(chartValue, elementToFound_neu);
+                int negCount = Collections.frequency(chartValue, elementToFound_neg);
+
+                pos = posCount;
+                neu = neuCount;
+                neg = negCount;
+
+                showPieChart();
+                progressBar.setVisibility(View.GONE);
             } catch (JSONException e) {
                 Toast.makeText(MainActivity.this, e.getMessage(),Toast.LENGTH_LONG).show();
                 e.printStackTrace();
             }
-            mRecyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-            adapter = new Adapter(getApplicationContext(), dcardList);
-            mRecyclerView.setAdapter(adapter);
-            int posCount = Collections.frequency(chartValue, elementToFound_pos);
-            int neuCount = Collections.frequency(chartValue, elementToFound_neu);
-            int negCount = Collections.frequency(chartValue, elementToFound_neg);
-
-            pos = posCount;
-            neu = neuCount;
-            neg = negCount;
-
-            showPieChart();
         }, error -> {
             Toast.makeText(MainActivity.this, error.getMessage(),Toast.LENGTH_LONG).show();
             error.printStackTrace();
