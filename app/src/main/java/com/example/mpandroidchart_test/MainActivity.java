@@ -63,6 +63,9 @@ public class MainActivity extends AppCompatActivity {
     private static final String elementToFound_pos = "Positive";
     private static final String elementToFound_neu = "Neutral";
     private static final String elementToFound_neg = "Negative";
+    private static final String posColor = "#33FFAA";
+    private static final String neuColor = "#FFDD55";
+    private static final String negColor = "#FFA488";
     List<Dcard> dcardList;
     List<String> chartValue;
     Integer neg, neu, pos;
@@ -367,15 +370,15 @@ public class MainActivity extends AppCompatActivity {
 
         //initializing data
         Map<String, Integer> typeAmountMap = new HashMap<>();
-        typeAmountMap.put("Positive",pos);
-        typeAmountMap.put("Neutral",neu);
-        typeAmountMap.put("Negative",neg);
+        typeAmountMap.put(elementToFound_pos,pos);
+        typeAmountMap.put(elementToFound_neu,neu);
+        typeAmountMap.put(elementToFound_neg,neg);
 
         //initializing colors for the entries
         ArrayList<Integer> colors = new ArrayList<>();
-        colors.add(Color.parseColor("#FFDD55"));
-        colors.add(Color.parseColor("#FFA488"));
-        colors.add(Color.parseColor("#33FFAA"));
+        colors.add(Color.parseColor(neuColor));
+        colors.add(Color.parseColor(negColor));
+        colors.add(Color.parseColor(posColor));
 
         //input data and fit data into pie chart entry
         for(String type: typeAmountMap.keySet()){
