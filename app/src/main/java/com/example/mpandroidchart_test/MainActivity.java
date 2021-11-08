@@ -12,6 +12,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -60,6 +61,10 @@ public class MainActivity extends AppCompatActivity {
     BarChart mChart;
     PieChart pieChart;
     private static final String DCARD_URL = "https://cguimfinalproject-test.herokuapp.com/GetData5.php";
+    private static final String ALL_DCARD_URL = "https://cguimfinalproject-test.herokuapp.com/getAllDcard.php";
+    private static final String TODAY_DCARD_URL = "https://cguimfinalproject-test.herokuapp.com/getTodayDcard.php";
+    private static final String MONTH_DCARD_URL = "https://cguimfinalproject-test.herokuapp.com/getMonthDcard.php";
+    private static final String WEEK_DCARD_URL = "https://cguimfinalproject-test.herokuapp.com/getWeekDcard.php";
     private static final String elementToFound_pos = "Positive";
     private static final String elementToFound_neu = "Neutral";
     private static final String elementToFound_neg = "Negative";
@@ -78,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
     ProgressBar progressBar;
 
     EditText edtxt;
+    Button getToday_btn, getWeek_btn, getMonth_btn;
 
 
     @Override
@@ -103,6 +109,20 @@ public class MainActivity extends AppCompatActivity {
             public void afterTextChanged(Editable s) {
                 filter(s.toString());
             }
+        });
+        getToday_btn = findViewById(R.id.getToday_btn);
+        getToday_btn.setOnClickListener(v -> {
+            loadTodayDcardWithVolley();
+        });
+
+        getWeek_btn = findViewById(R.id.getWeek_btn);
+        getWeek_btn.setOnClickListener(v -> {
+            loadWeekDcardWithVolley();
+        });
+
+        getMonth_btn = findViewById(R.id.getMonth_btn);
+        getMonth_btn.setOnClickListener(v -> {
+            loadMonthDcardWithVolley();
         });
 
         mRecyclerView.setHasFixedSize(true);
@@ -231,6 +251,171 @@ public class MainActivity extends AppCompatActivity {
         HttpsTrustManager.allowAllSSL();
         RequestQueue queue = Volley.newRequestQueue(this);
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, DCARD_URL, null, response -> {
+            try {
+                for (int i = 0; i < response.length(); i++) {
+                    JSONObject dcardObject = response.getJSONObject(i);
+                    Dcard dcard = new Dcard();
+                    dcard.setSascore(dcardObject.getString("SA_Score"));
+                    dcard.setSaclass(dcardObject.getString("SA_Class"));
+                    dcard.setTitle(dcardObject.getString("Title"));
+                    dcard.setDate(dcardObject.getString("CreatedAt"));
+                    dcard.setContent(dcardObject.getString("Content"));
+                    dcard.setId(dcardObject.getString("Id"));
+                    dcard.setLv1(dcardObject.getString("KeywordLevel1"));
+                    dcard.setLv2(dcardObject.getString("KeywordLevel2"));
+                    dcard.setLv3(dcardObject.getString("KeywordLevel3"));
+                    switch (dcardObject.getString("SA_Class")){
+                        case "Positive":
+                            dcard.setSaclassnum("2.0");
+                            break;
+                        case "Neutral":
+                            dcard.setSaclassnum("0.0");
+                            break;
+                        case "Negative":
+                            dcard.setSaclassnum("1.0");
+                            break;
+                    }
+                    dcardList.add(dcard);
+                    chartValue.add(dcardObject.getString("SA_Class"));
+                }
+                mRecyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+                adapter = new Adapter(getApplicationContext(), dcardList);
+                mRecyclerView.setAdapter(adapter);
+                int posCount = Collections.frequency(chartValue, elementToFound_pos);
+                int neuCount = Collections.frequency(chartValue, elementToFound_neu);
+                int negCount = Collections.frequency(chartValue, elementToFound_neg);
+
+                pos = posCount;
+                neu = neuCount;
+                neg = negCount;
+
+                showPieChart();
+                progressBar.setVisibility(View.GONE);
+            } catch (JSONException e) {
+                Toast.makeText(MainActivity.this, e.getMessage(),Toast.LENGTH_LONG).show();
+                e.printStackTrace();
+            }
+        }, error -> {
+            Toast.makeText(MainActivity.this, error.getMessage(),Toast.LENGTH_LONG).show();
+            error.printStackTrace();
+        });
+        queue.add(jsonArrayRequest);
+    }
+
+    public void loadTodayDcardWithVolley(){
+        HttpsTrustManager.allowAllSSL();
+        RequestQueue queue = Volley.newRequestQueue(this);
+        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, TODAY_DCARD_URL, null, response -> {
+            try {
+                for (int i = 0; i < response.length(); i++) {
+                    JSONObject dcardObject = response.getJSONObject(i);
+                    Dcard dcard = new Dcard();
+                    dcard.setSascore(dcardObject.getString("SA_Score"));
+                    dcard.setSaclass(dcardObject.getString("SA_Class"));
+                    dcard.setTitle(dcardObject.getString("Title"));
+                    dcard.setDate(dcardObject.getString("CreatedAt"));
+                    dcard.setContent(dcardObject.getString("Content"));
+                    dcard.setId(dcardObject.getString("Id"));
+                    dcard.setLv1(dcardObject.getString("KeywordLevel1"));
+                    dcard.setLv2(dcardObject.getString("KeywordLevel2"));
+                    dcard.setLv3(dcardObject.getString("KeywordLevel3"));
+                    switch (dcardObject.getString("SA_Class")){
+                        case "Positive":
+                            dcard.setSaclassnum("2.0");
+                            break;
+                        case "Neutral":
+                            dcard.setSaclassnum("0.0");
+                            break;
+                        case "Negative":
+                            dcard.setSaclassnum("1.0");
+                            break;
+                    }
+                    dcardList.add(dcard);
+                    chartValue.add(dcardObject.getString("SA_Class"));
+                }
+                mRecyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+                adapter = new Adapter(getApplicationContext(), dcardList);
+                mRecyclerView.setAdapter(adapter);
+                int posCount = Collections.frequency(chartValue, elementToFound_pos);
+                int neuCount = Collections.frequency(chartValue, elementToFound_neu);
+                int negCount = Collections.frequency(chartValue, elementToFound_neg);
+
+                pos = posCount;
+                neu = neuCount;
+                neg = negCount;
+
+                showPieChart();
+                progressBar.setVisibility(View.GONE);
+            } catch (JSONException e) {
+                Toast.makeText(MainActivity.this, e.getMessage(),Toast.LENGTH_LONG).show();
+                e.printStackTrace();
+            }
+        }, error -> {
+            Toast.makeText(MainActivity.this, error.getMessage(),Toast.LENGTH_LONG).show();
+            error.printStackTrace();
+        });
+        queue.add(jsonArrayRequest);
+    }
+
+    public void loadMonthDcardWithVolley(){
+        HttpsTrustManager.allowAllSSL();
+        RequestQueue queue = Volley.newRequestQueue(this);
+        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, MONTH_DCARD_URL, null, response -> {
+            try {
+                for (int i = 0; i < response.length(); i++) {
+                    JSONObject dcardObject = response.getJSONObject(i);
+                    Dcard dcard = new Dcard();
+                    dcard.setSascore(dcardObject.getString("SA_Score"));
+                    dcard.setSaclass(dcardObject.getString("SA_Class"));
+                    dcard.setTitle(dcardObject.getString("Title"));
+                    dcard.setDate(dcardObject.getString("CreatedAt"));
+                    dcard.setContent(dcardObject.getString("Content"));
+                    dcard.setId(dcardObject.getString("Id"));
+                    dcard.setLv1(dcardObject.getString("KeywordLevel1"));
+                    dcard.setLv2(dcardObject.getString("KeywordLevel2"));
+                    dcard.setLv3(dcardObject.getString("KeywordLevel3"));
+                    switch (dcardObject.getString("SA_Class")){
+                        case "Positive":
+                            dcard.setSaclassnum("2.0");
+                            break;
+                        case "Neutral":
+                            dcard.setSaclassnum("0.0");
+                            break;
+                        case "Negative":
+                            dcard.setSaclassnum("1.0");
+                            break;
+                    }
+                    dcardList.add(dcard);
+                    chartValue.add(dcardObject.getString("SA_Class"));
+                }
+                mRecyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+                adapter = new Adapter(getApplicationContext(), dcardList);
+                mRecyclerView.setAdapter(adapter);
+                int posCount = Collections.frequency(chartValue, elementToFound_pos);
+                int neuCount = Collections.frequency(chartValue, elementToFound_neu);
+                int negCount = Collections.frequency(chartValue, elementToFound_neg);
+
+                pos = posCount;
+                neu = neuCount;
+                neg = negCount;
+
+                showPieChart();
+                progressBar.setVisibility(View.GONE);
+            } catch (JSONException e) {
+                Toast.makeText(MainActivity.this, e.getMessage(),Toast.LENGTH_LONG).show();
+                e.printStackTrace();
+            }
+        }, error -> {
+            Toast.makeText(MainActivity.this, error.getMessage(),Toast.LENGTH_LONG).show();
+            error.printStackTrace();
+        });
+        queue.add(jsonArrayRequest);
+    }
+
+    public void loadWeekDcardWithVolley(){
+        HttpsTrustManager.allowAllSSL();
+        RequestQueue queue = Volley.newRequestQueue(this);
+        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, WEEK_DCARD_URL, null, response -> {
             try {
                 for (int i = 0; i < response.length(); i++) {
                     JSONObject dcardObject = response.getJSONObject(i);
