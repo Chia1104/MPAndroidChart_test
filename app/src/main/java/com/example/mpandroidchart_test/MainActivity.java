@@ -252,6 +252,9 @@ public class MainActivity extends AppCompatActivity {
         RequestQueue queue = Volley.newRequestQueue(this);
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, DCARD_URL, null, response -> {
             try {
+                progressBar.setVisibility(View.VISIBLE);
+                dcardList.clear();
+                chartValue.clear();
                 for (int i = 0; i < response.length(); i++) {
                     JSONObject dcardObject = response.getJSONObject(i);
                     Dcard dcard = new Dcard();
@@ -303,10 +306,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void loadTodayDcardWithVolley(){
+        progressBar.setVisibility(View.VISIBLE);
         HttpsTrustManager.allowAllSSL();
         RequestQueue queue = Volley.newRequestQueue(this);
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, TODAY_DCARD_URL, null, response -> {
             try {
+                progressBar.setVisibility(View.VISIBLE);
+                dcardList.clear();
+                chartValue.clear();
                 for (int i = 0; i < response.length(); i++) {
                     JSONObject dcardObject = response.getJSONObject(i);
                     Dcard dcard = new Dcard();
@@ -362,6 +369,9 @@ public class MainActivity extends AppCompatActivity {
         RequestQueue queue = Volley.newRequestQueue(this);
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, MONTH_DCARD_URL, null, response -> {
             try {
+                progressBar.setVisibility(View.VISIBLE);
+                dcardList.clear();
+                chartValue.clear();
                 for (int i = 0; i < response.length(); i++) {
                     JSONObject dcardObject = response.getJSONObject(i);
                     Dcard dcard = new Dcard();
@@ -417,6 +427,9 @@ public class MainActivity extends AppCompatActivity {
         RequestQueue queue = Volley.newRequestQueue(this);
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, WEEK_DCARD_URL, null, response -> {
             try {
+                progressBar.setVisibility(View.VISIBLE);
+                dcardList.clear();
+                chartValue.clear();
                 for (int i = 0; i < response.length(); i++) {
                     JSONObject dcardObject = response.getJSONObject(i);
                     Dcard dcard = new Dcard();

@@ -3,6 +3,8 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/yuyuc/AndroidStudioProjects/MPAndroidChart_test/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.556923076923077" />
+        <entry key="..\:/Users/yuyuc/AndroidStudioProjects/MPAndroidChart_test/app/src/main/res/drawable/ic_launcher_background.xml" value="0.556923076923077" />
         <entry key="..\:/Users/yuyuc/AndroidStudioProjects/MPAndroidChart_test/app/src/main/res/layout/activity_dcard_detail.xml" value="0.33" />
         <entry key="..\:/Users/yuyuc/AndroidStudioProjects/MPAndroidChart_test/app/src/main/res/layout/activity_main.xml" value="0.5390625" />
         <entry key="..\:/Users/yuyuc/AndroidStudioProjects/MPAndroidChart_test/app/src/main/res/layout/article_list_item.xml" value="0.5536458333333333" />
