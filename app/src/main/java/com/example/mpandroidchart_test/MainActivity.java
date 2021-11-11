@@ -248,11 +248,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void loadDcardWithVolley(){
+        progressBar.setVisibility(View.VISIBLE);
         HttpsTrustManager.allowAllSSL();
         RequestQueue queue = Volley.newRequestQueue(this);
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, DCARD_URL, null, response -> {
             try {
-                progressBar.setVisibility(View.VISIBLE);
                 dcardList.clear();
                 chartValue.clear();
                 for (int i = 0; i < response.length(); i++) {
@@ -295,10 +295,12 @@ public class MainActivity extends AppCompatActivity {
                 showPieChart();
                 progressBar.setVisibility(View.GONE);
             } catch (JSONException e) {
+                progressBar.setVisibility(View.GONE);
                 Toast.makeText(MainActivity.this, e.getMessage(),Toast.LENGTH_LONG).show();
                 e.printStackTrace();
             }
         }, error -> {
+            progressBar.setVisibility(View.GONE);
             Toast.makeText(MainActivity.this, error.getMessage(),Toast.LENGTH_LONG).show();
             error.printStackTrace();
         });
@@ -311,7 +313,6 @@ public class MainActivity extends AppCompatActivity {
         RequestQueue queue = Volley.newRequestQueue(this);
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, TODAY_DCARD_URL, null, response -> {
             try {
-                progressBar.setVisibility(View.VISIBLE);
                 dcardList.clear();
                 chartValue.clear();
                 for (int i = 0; i < response.length(); i++) {
@@ -354,10 +355,12 @@ public class MainActivity extends AppCompatActivity {
                 showPieChart();
                 progressBar.setVisibility(View.GONE);
             } catch (JSONException e) {
+                progressBar.setVisibility(View.GONE);
                 Toast.makeText(MainActivity.this, e.getMessage(),Toast.LENGTH_LONG).show();
                 e.printStackTrace();
             }
         }, error -> {
+            progressBar.setVisibility(View.GONE);
             Toast.makeText(MainActivity.this, error.getMessage(),Toast.LENGTH_LONG).show();
             error.printStackTrace();
         });
@@ -365,11 +368,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void loadMonthDcardWithVolley(){
+        progressBar.setVisibility(View.VISIBLE);
         HttpsTrustManager.allowAllSSL();
         RequestQueue queue = Volley.newRequestQueue(this);
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, MONTH_DCARD_URL, null, response -> {
             try {
-                progressBar.setVisibility(View.VISIBLE);
                 dcardList.clear();
                 chartValue.clear();
                 for (int i = 0; i < response.length(); i++) {
@@ -412,10 +415,12 @@ public class MainActivity extends AppCompatActivity {
                 showPieChart();
                 progressBar.setVisibility(View.GONE);
             } catch (JSONException e) {
+                progressBar.setVisibility(View.GONE);
                 Toast.makeText(MainActivity.this, e.getMessage(),Toast.LENGTH_LONG).show();
                 e.printStackTrace();
             }
         }, error -> {
+            progressBar.setVisibility(View.GONE);
             Toast.makeText(MainActivity.this, error.getMessage(),Toast.LENGTH_LONG).show();
             error.printStackTrace();
         });
@@ -423,11 +428,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void loadWeekDcardWithVolley(){
+        progressBar.setVisibility(View.VISIBLE);
         HttpsTrustManager.allowAllSSL();
         RequestQueue queue = Volley.newRequestQueue(this);
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, WEEK_DCARD_URL, null, response -> {
             try {
-                progressBar.setVisibility(View.VISIBLE);
                 dcardList.clear();
                 chartValue.clear();
                 for (int i = 0; i < response.length(); i++) {
@@ -470,10 +475,12 @@ public class MainActivity extends AppCompatActivity {
                 showPieChart();
                 progressBar.setVisibility(View.GONE);
             } catch (JSONException e) {
+                progressBar.setVisibility(View.GONE);
                 Toast.makeText(MainActivity.this, e.getMessage(),Toast.LENGTH_LONG).show();
                 e.printStackTrace();
             }
         }, error -> {
+            progressBar.setVisibility(View.GONE);
             Toast.makeText(MainActivity.this, error.getMessage(),Toast.LENGTH_LONG).show();
             error.printStackTrace();
         });
