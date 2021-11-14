@@ -51,7 +51,6 @@ public class MPBarChart extends AppCompatActivity {
     // array list for storing entries.
     ArrayList barEntries;
 
-    List<Integer> monthValue;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,10 +58,10 @@ public class MPBarChart extends AppCompatActivity {
 
         barChartValue = new ArrayList<>();
 
-        loadChartValue();
+        loadBarChartValue();
     }
 
-    public void loadChartValue() {
+    public void loadBarChartValue() {
         HttpsTrustManager.allowAllSSL();
         RequestQueue queue = Volley.newRequestQueue(this);
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, BARCHART_URL, null, response -> {
@@ -98,20 +97,8 @@ public class MPBarChart extends AppCompatActivity {
     }
 
     public void ShowBarChart() {
-        monthValue = new ArrayList<>();
         String[] month = new String[]{barChartValue.get(0), barChartValue.get(4), barChartValue.get(8), barChartValue.get(12)};
         String[] days = new String[]{"4", "3", "2", "1"};
-
-//        for (int i = 0; i >= -3; i--){
-//            Calendar c = Calendar.getInstance();
-//            c.add(Calendar.MONTH, i);
-//            int month = c.get(Calendar.MONTH) + 1;
-//            monthValue.add(month);
-//        }
-//        List<String> monthStringValue = new ArrayList<>(monthValue.size());
-//        for (Integer i : monthValue) {
-//            monthStringValue.add(String.valueOf(i));
-//        }
 
         barChart = findViewById(R.id.bar_chart);
 
